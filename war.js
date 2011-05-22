@@ -1,5 +1,28 @@
+/**
+ * Mixin class for comparing cards in a suitless matter with "ace high" value.
+ */
+var AceHighSuitlessCompare = new Class({
+    /**
+     * Compares two cards only by their rank.
+     * @param other The other card you are comparing to this one.
+     * @returns A positive integer if THIS (not other!) card is greater, a negative integer if the other card is greater, and 0 if they are equal.
+     */
+    compare: function (other) {
+        // move the ace up in value to reflect "ace high" value
+        var thisRank = (this.rank == 1) ? 14 : this.rank;
+        var otherRank = (other.rank == 1) ? 14 : other.rank;
+
+        return thisRank - otherRank;
+    }
+});
+
+/**
+ * Representation of a standard playing card. Valid ranks are from 1-13 (Ace through King) and valid
+ * suits are the strings "H", "S", "C", and "D" for hearts, spades, clubs, and diamonds respectively.
+ */
 var Card = new Class({
-    Implements: [Options, Events],
+    Implements: [Options, Events, AceHighSuitlessCompare],
+
     options: {
         rank: 0,
         suit: "X"
@@ -11,6 +34,10 @@ var Card = new Class({
         this.suit = this.options.suit;
     },
 
+    /**
+     * Converts this card to its corresponding string representation.
+     * @returns A string with the rank followed immediately by a single character for the suit.
+     */
     toString: function () {
         var rankStr = "";
         switch (this.rank) {
@@ -38,6 +65,7 @@ var Card = new Class({
     }
 });
 
+// TODO
 var Deck = new Class({
     Implements: [Options, Events],
     options: {},
@@ -58,12 +86,28 @@ window.addEvent('domready', function () {
         suit: "D"
     });
 
+    var sevenOfHearts = new Card({
+        rank: 7,
+        suit: "H"
+    });
+
     var kingOfClubs = new Card({
         rank: 13,
         suit: "C"
     });
     
-    console.log("Ace of spades: " + aceOfSpades.toString());
-    console.log("Two of diamonds: " + twoOfDiamonds.toString());
-    console.log("King of clubs: " + kingOfClubs.toString());
+    console.log("Comparing " + twoOfDiamonds.toString() + " to " + sevenOfHearts.toString() + ": " +
+        twoOfDiamonds.compare(sevenOfHearts));
+   
+    console.log("Comparing " + sevenOfHearts.toString() + " to " + twoOfDiamonds.toString() + ": " +
+        sevenOfHearts.compare(twoOfDiamonds));
+    
+    console.log("Comparing " + twoOfDiamonds.toString() + " to " + twoOfDiamonds.toString() + ": " +
+        twoOfDiamonds.compare(twoOfDiamonds));
+    
+    console.log("Comparing " + aceOfSpades.toString() + " to " + twoOfDiamonds.toString() + ": " +
+        aceOfSpades.compare(twoOfDiamonds));
+
+    console.log("Comparing " + kingOfClubs.toString() + " to " + aceOfSpades.toString() + ": " +
+        kingOfClubs.compare(aceOfSpades));
 });
