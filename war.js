@@ -87,29 +87,48 @@ var Deck = new Class({
      * clubs, and diamonds.
      */
     createStandard: function () {
-
+        var suits = ["S", "H", "C", "D"];
+        for (var suit = 0; suit < suits.length; suit++) {
+            for (var rank = 1; rank <= 13; rank++) {
+                this.addToBottom(new Card({
+                    rank: rank,
+                    suit: suits[suit]
+                }));
+            }
+        }
     },
 
     /**
      * Randomly reorders all the cards in the deck.
      */
     shuffle: function () {
+        var newCards = [];
 
+        // run through the whole deck, select a random card each time, and add it to the new deck
+        while (this.cards.length > 0) {
+            var i = Math.floor(Math.random() * this.cards.length);
+            newCards.push(this.cards.splice(i, 1));
+        }
+
+        this.cards = newCards;
     },
 
     /**
      * Removes (and returns) a card from the top of the deck.
+     * This is just a handy alias to the underlying array's shift() method.
      * @returns The Card object that was on the top of the deck.
      */
-    pop: function () {
-
+    removeFromTop: function () {
+        return this.cards.shift();
     },
 
     /**
      * Adds a card to the bottom of the deck.
+     * This is just a handy alias to the underlying array's push() method.
+     * @param card The Card object to add to the bottom of the deck.
      */
-    push: function () {
-
+    addToBottom: function (card) {
+        return this.cards.push(card);
     }
 });
 
@@ -148,4 +167,16 @@ window.addEvent('domready', function () {
 
     console.log("Comparing " + kingOfClubs.toString() + " to " + aceOfSpades.toString() + ": " +
         kingOfClubs.compare(aceOfSpades));
+
+    var deck = new Deck();
+    deck.createStandard();
+    for (var i = 0; i < deck.cards.length; i++) {
+        console.log("Card " + i + " is " + deck.cards[i].toString());
+    }
+
+    console.log("Shuffling!");
+    deck.shuffle();
+    for (var i = 0; i < deck.cards.length; i++) {
+        console.log("Card " + i + " is " + deck.cards[i].toString());
+    }
 });
