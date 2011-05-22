@@ -132,6 +132,76 @@ var Deck = new Class({
     }
 });
 
+/**
+ * Represents a player in a game of War.
+ */
+var Player = new Class({
+    Implements: [Options, Events],
+
+    options: {
+        deck: new Deck(),
+        name: "Player",
+        alive: true
+    },
+
+    initialize: function (options) {
+        this.setOptions(options);
+        this.deck = this.options.deck;
+        this.name = this.options.name;
+        this.alive = this.options.alive;
+    },
+
+    /**
+     * Removes the specified number of cards from the player's deck and returns them. If you request
+     * to take more than one card and taking that many would leave them with nothing, one card is
+     * retained to resolve the war.
+     * @param howMany The number of cards to take. This is not necessarily how many cards will be returned.
+     */
+    take: function (howMany) {
+        // TODO
+    },
+
+    /**
+     * Receives an array of cards and adds them all to the player's deck. Also triggers a players
+     * death if they have no cards and receive none.
+     * @param An array of cards to add to the player's deck.
+     */
+    receive: function (cards) {
+        // TODO
+    }
+});
+
+/**
+ * Implements critical game logic like keeping track of players and wars, as well as what cards are
+ * currently on the board. Every time playRound() is called the game will take one card from each
+ * player and advance the simulation.
+ */
+var Game = new Class({
+    Implements: [Options, Events],
+
+    options: {
+        players: [],
+        board: [],
+        warChest: [],
+        warMode: false;
+    },
+
+    initialize: function (options) {
+        this.setOptions(options);
+        this.players = this.options.players;
+        this.board = this.options.board;
+        this.wars = this.options.wars;
+    },
+
+    /**
+     * Plays war! If players are currently in a war it takes 3 cards from each and puts them in the
+     * warchest. Otherwise, it takes one card from each to decide the outcome of the round.
+     */
+    play: function () {
+        // TODO
+    }
+});
+
 window.addEvent('domready', function () {
     var aceOfSpades = new Card({
         rank: 1,
