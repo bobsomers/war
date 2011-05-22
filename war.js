@@ -65,12 +65,50 @@ var Card = new Class({
     }
 });
 
-// TODO
+/**
+ * Represents a deck of playing cards. By default the deck is empty when it's created. If you'd like
+ * it to contain a standard set of US playing cards, you can use the createStandard() method after
+ * construction to do so.
+ */
 var Deck = new Class({
     Implements: [Options, Events],
-    options: {},
+
+    options: {
+        cards: []
+    },
 
     initialize: function (options) {
+        this.setOptions(options);
+        this.cards = this.options.cards;
+    },
+
+    /**
+     * Fills the deck with a standard set of playing cards, ace through king of spades, hearts,
+     * clubs, and diamonds.
+     */
+    createStandard: function () {
+
+    },
+
+    /**
+     * Randomly reorders all the cards in the deck.
+     */
+    shuffle: function () {
+
+    },
+
+    /**
+     * Removes (and returns) a card from the top of the deck.
+     * @returns The Card object that was on the top of the deck.
+     */
+    pop: function () {
+
+    },
+
+    /**
+     * Adds a card to the bottom of the deck.
+     */
+    push: function () {
 
     }
 });
