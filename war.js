@@ -180,12 +180,13 @@ var Player = new Class({
     },
 
     /**
-     * Receives an array of cards and adds them all to the player's deck. Also triggers a players
-     * death if they have no cards and receive none.
+     * Receives an array of cards and adds them all to the player's deck.
      * @param An array of cards to add to the player's deck.
      */
     receive: function (cards) {
-        // TODO
+        for (var i = 0; i < cards.length; i++) {
+            this.deck.addToBottom(cards[i]);
+        }
     }
 });
 
@@ -231,25 +232,40 @@ window.addEvent('domready', function () {
     console.log("Contents of the deck:");
     printCards(player.deck.cards);
 
-    var cards = player.take(1);
+    var first = player.take(1);
 
     console.log("Taking 1 from the deck:");
-    printCards(cards);
+    printCards(first);
     console.log("Contents of the deck:");
     printCards(player.deck.cards);
 
-    cards = player.take(3);
+    var second = player.take(3);
 
     console.log("Taking 3 from the deck:");
-    printCards(cards);
+    printCards(second);
     console.log("Contents of the deck:");
     printCards(player.deck.cards);
 
-    cards = player.take(1);
+    var third = player.take(1);
 
     console.log("Taking 1 from the deck:");
-    printCards(cards);
+    printCards(third);
     console.log("Contents of the deck:");
+    printCards(player.deck.cards);
+
+    player.receive(second);
+    
+    console.log("Receiving the second batch of cards:");
+    printCards(player.deck.cards);
+
+    player.receive(first);
+    
+    console.log("Receiving the first batch of cards:");
+    printCards(player.deck.cards);
+
+    player.receive(third);
+
+    console.log("Receiving the third batch of cards:");
     printCards(player.deck.cards);
 });
 
