@@ -129,6 +129,15 @@ var Deck = new Class({
      */
     addToBottom: function (card) {
         return this.cards.push(card);
+    },
+
+    /**
+     * Returns the size of the deck (number of cards).
+     * This is just a handy alias to the underlying array's length member.
+     * @returns The size of the deck, in number of cards.
+     */
+    size: function() {
+        return this.cards.length;
     }
 });
 
@@ -158,7 +167,16 @@ var Player = new Class({
      * @param howMany The number of cards to take. This is not necessarily how many cards will be returned.
      */
     take: function (howMany) {
-        // TODO
+        if ((howMany > 1) && (this.deck.size() - howMany) <= 0) {
+            howMany = this.deck.size() - 1;
+        }
+
+        var cards = [];
+        for (var i = 0; i < howMany; i++) {
+            cards.push(this.deck.removeFromTop());
+        }
+
+        return cards;
     },
 
     /**
@@ -183,7 +201,7 @@ var Game = new Class({
         players: [],
         board: [],
         warChest: [],
-        warMode: false;
+        warMode: false
     },
 
     initialize: function (options) {
@@ -203,50 +221,40 @@ var Game = new Class({
 });
 
 window.addEvent('domready', function () {
-    var aceOfSpades = new Card({
-        rank: 1,
-        suit: "S"
-    });
+    var player = new Player();
+    player.deck = new Deck();
+    player.deck.addToBottom(new Card({rank: 1, suit: "S"}));
+    player.deck.addToBottom(new Card({rank: 2, suit: "H"}));
+    player.deck.addToBottom(new Card({rank: 3, suit: "C"}));
+    player.deck.addToBottom(new Card({rank: 4, suit: "D"}));
 
-    var twoOfDiamonds = new Card({
-        rank: 2,
-        suit: "D"
-    });
+    console.log("Contents of the deck:");
+    printCards(player.deck.cards);
 
-    var sevenOfHearts = new Card({
-        rank: 7,
-        suit: "H"
-    });
+    var cards = player.take(1);
 
-    var kingOfClubs = new Card({
-        rank: 13,
-        suit: "C"
-    });
-    
-    console.log("Comparing " + twoOfDiamonds.toString() + " to " + sevenOfHearts.toString() + ": " +
-        twoOfDiamonds.compare(sevenOfHearts));
-   
-    console.log("Comparing " + sevenOfHearts.toString() + " to " + twoOfDiamonds.toString() + ": " +
-        sevenOfHearts.compare(twoOfDiamonds));
-    
-    console.log("Comparing " + twoOfDiamonds.toString() + " to " + twoOfDiamonds.toString() + ": " +
-        twoOfDiamonds.compare(twoOfDiamonds));
-    
-    console.log("Comparing " + aceOfSpades.toString() + " to " + twoOfDiamonds.toString() + ": " +
-        aceOfSpades.compare(twoOfDiamonds));
+    console.log("Taking 1 from the deck:");
+    printCards(cards);
+    console.log("Contents of the deck:");
+    printCards(player.deck.cards);
 
-    console.log("Comparing " + kingOfClubs.toString() + " to " + aceOfSpades.toString() + ": " +
-        kingOfClubs.compare(aceOfSpades));
+    cards = player.take(3);
 
-    var deck = new Deck();
-    deck.createStandard();
-    for (var i = 0; i < deck.cards.length; i++) {
-        console.log("Card " + i + " is " + deck.cards[i].toString());
-    }
+    console.log("Taking 3 from the deck:");
+    printCards(cards);
+    console.log("Contents of the deck:");
+    printCards(player.deck.cards);
 
-    console.log("Shuffling!");
-    deck.shuffle();
-    for (var i = 0; i < deck.cards.length; i++) {
-        console.log("Card " + i + " is " + deck.cards[i].toString());
-    }
+    cards = player.take(1);
+
+    console.log("Taking 1 from the deck:");
+    printCards(cards);
+    console.log("Contents of the deck:");
+    printCards(player.deck.cards);
 });
+
+function printCards(cards) {
+    for (var i = 0; i < cards.length; i++) {
+        console.log("\t[" + i + "] " + cards[i].toString());
+    }
+}
