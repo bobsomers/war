@@ -211,7 +211,8 @@ var Game = new Class({
         players: [],
         board: [],
         warChest: [],
-        warMode: false
+        warMode: false,
+        playing: true
     },
 
     initialize: function (options) {
@@ -220,6 +221,7 @@ var Game = new Class({
         this.board = this.options.board;
         this.warChest = this.options.warChest;
         this.warMode = this.options.warMode;
+        this.playing = this.options.playing;
     },
 
     /**
@@ -271,11 +273,6 @@ var Game = new Class({
                 }
             }
 
-            // check for the win condition here, because you can have a situation where a player's
-            // last card was used in a war, but then THAT card started a double war and he has no
-            // cards left at all
-            this.checkWin();
-            
             console.log("Collected cards:");
             printCards(this.board);
 
@@ -344,6 +341,7 @@ var Game = new Class({
                 this.warChest = [];
             }
 
+            // check for win condition
             this.checkWin();
         }
     },
@@ -369,6 +367,7 @@ var Game = new Class({
 
         if (numLivePlayers == 1) {
             console.log("Player " + lastLivePlayer + " won!");
+            this.playing = false;
             
             // TODO: various "you won!" things...
         }
@@ -377,8 +376,6 @@ var Game = new Class({
 
 var game;
 var timer;
-var playing = true;
-
 
 window.addEvent('domready', function () {
     // create the players and the game
@@ -390,7 +387,6 @@ window.addEvent('domready', function () {
 
     // create a new deck and deal the players cards
     var deck = new Deck();
-    
     deck.createStandard();
     deck.shuffle();
     var togglePlayers = true;
@@ -409,14 +405,14 @@ window.addEvent('domready', function () {
 
     console.log("Second player's starting deck:");
     printCards(sp.deck.cards);
-
+    
     timer = (function () {
-        if (playing) {
+        if (game.playing) {
             game.play();
         } else {
             clearInterval(timer);
         }
-    }).periodical(250);
+    }).periodical(100);
 });
 
 function printCards(cards) {
