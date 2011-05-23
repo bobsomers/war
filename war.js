@@ -185,8 +185,17 @@ var Player = new Class({
      */
     receive: function (cards) {
         for (var i = 0; i < cards.length; i++) {
-            this.deck.addToBottom(cards[i]);
+            if (cards[i] != null) {
+                this.deck.addToBottom(cards[i]);
+            }
         }
+    },
+
+    kill: function () {
+        this.alive = false;
+
+        // TODO: more things when a player dies
+        playing = false;
     }
 });
 
@@ -209,7 +218,16 @@ var Game = new Class({
         this.setOptions(options);
         this.players = this.options.players;
         this.board = this.options.board;
-        this.wars = this.options.wars;
+        this.warChest = this.options.warChest;
+        this.warMode = this.options.warMode;
+    },
+
+    /**
+     * Adds a player to the list of players in the game.
+     * @param player The player to add.
+     */
+    addPlayer: function (player) {
+        this.players.append(Array.from(player));
     },
 
     /**
@@ -217,56 +235,188 @@ var Game = new Class({
      * warchest. Otherwise, it takes one card from each to decide the outcome of the round.
      */
     play: function () {
-        // TODO
-    }
+        // TODO: go over this function and check for DEAD players!
+
+        console.log("Players deck counts:");
+        for (var i = 0; i < this.players.length; i++) {
+            console.log("\t [" + i + "] " + this.players[i].deck.cards.length);
+        }
+              
+        if (this.warMode) {
+            // take three cards from each player add it to the warchest stack
+            var booty = [];
+            for (var i = 0; i < this.players.length; i++) {
+                if (this.players[i].alive) {
+                    booty[i] = this.players[i].take(3);
+                } else {
+                    booty[i] = null; // still need to pad this spot
+                }
+            }
+            this.warChest.push(booty);
+
+            this.warMode = false;
+
+            // for debugging purposes, print the contents of warchest
+            // TODO remove me!
+            var copy = Array.clone(this.warChest);
+            console.log("War chest contents:");
+            printCards(copy.flatten());
+        } else {
+            // take one card from each player and place it on the board
+            for (var i = 0; i < this.players.length; i++) {
+                if (this.players[i].alive) {
+                    this.board[i] = this.players[i].take(1)[0];
+                } else {
+                    this.board[i] = null; // still need to pad this spot
+                }
+            }
+
+            // check for the win condition here, because you can have a situation where a player's
+            // last card was used in a war, but then THAT card started a double war and he has no
+            // cards left at all
+            this.checkWin();
+            
+            console.log("Collected cards:");
+            printCards(this.board);
+
+            // make a linear pass over the board for the top two cards
+            var firstCard = null;
+            var firstPlayer = -1;
+            var secondCard = null;
+            var secondPlayer = -1;
+            for (var i = 0; i < this.board.length; i++) {
+                // ignore "null" cards (from dead players)
+                if (this.board[i] == null) {
+                    continue;
+                }
+
+                // if the first best hasn't been filled, fill it
+                if (firstCard == null) {
+                    firstCard = this.board[i];
+                    firstPlayer = i;
+                    continue;
+                }
+
+                // is this card the new first best?
+                if (this.board[i].compare(firstCard) > 0) {
+                    secondCard = firstCard;
+                    secondPlayer = firstPlayer;
+                    firstCard = this.board[i];
+                    firstPlayer = i;
+                    continue;
+                }
+
+                // if the second best hasn't been filled, fill it
+                if (secondCard == null) {
+                    secondCard = this.board[i];
+                    secondPlayer = i;
+                    continue;
+                }
+
+                // is this card the new second best?
+                if (this.board[i].compare(secondCard) > 0) {
+                    secondCard = this.board[i];
+                    secondPlayer = i;
+                    continue;
+                }
+            }
+
+            // if the two top cards are equal in value, we have a war! otherwise, we award all the
+            // cards on the board and in the warchest to the top card
+            if (firstCard.compare(secondCard) == 0) {
+                console.log("Players " + firstPlayer + " and " + secondPlayer + " started a war with " + firstCard.toString() + " and " + secondCard.toString()); 
+
+                this.warMode = true;
+
+                // add the contents of the board to the warchest
+                this.warChest.append(this.board);
+                this.board = [];
+            } else {
+                console.log("Player " + firstPlayer + " wins the hand with " + firstCard.toString());
+                
+                // winning player gets all the cards on the board
+                this.players[firstPlayer].receive(this.board);
+                this.board = [];
+
+                // winning player gets all the cards in the warchest
+                var temp = this.warChest.flatten();
+                this.players[firstPlayer].receive(temp);
+                this.warChest = [];
+            }
+
+            this.checkWin();
+        }
+    },
+
+    /**
+     * Kills any players that have no cards left in their deck and checks to see if we only have one
+     * live player left.
+     */
+    checkWin: function () {
+        // kill any alive players who have no more cards left
+        var numLivePlayers = 0;
+        var lastLivePlayer = -1;
+        for (var i = 0; i < this.players.length; i++) {
+            if (this.players[i].alive) {
+                if (this.players[i].deck.cards.length <= 0) {
+                    this.players[i].kill();
+                } else {
+                    lastLivePlayer = i;
+                    numLivePlayers += 1;
+                }
+            }
+        }
+
+        if (numLivePlayers == 1) {
+            console.log("Player " + lastLivePlayer + " won!");
+            
+            // TODO: various "you won!" things...
+        }
+    } 
 });
 
+var game;
+var timer;
+var playing = true;
+
+
 window.addEvent('domready', function () {
-    var player = new Player();
-    player.deck = new Deck();
-    player.deck.addToBottom(new Card({rank: 1, suit: "S"}));
-    player.deck.addToBottom(new Card({rank: 2, suit: "H"}));
-    player.deck.addToBottom(new Card({rank: 3, suit: "C"}));
-    player.deck.addToBottom(new Card({rank: 4, suit: "D"}));
+    // create the players and the game
+    var fp = new Player();
+    var sp = new Player();
+    game = new Game();
+    game.addPlayer(fp);
+    game.addPlayer(sp);
 
-    console.log("Contents of the deck:");
-    printCards(player.deck.cards);
-
-    var first = player.take(1);
-
-    console.log("Taking 1 from the deck:");
-    printCards(first);
-    console.log("Contents of the deck:");
-    printCards(player.deck.cards);
-
-    var second = player.take(3);
-
-    console.log("Taking 3 from the deck:");
-    printCards(second);
-    console.log("Contents of the deck:");
-    printCards(player.deck.cards);
-
-    var third = player.take(1);
-
-    console.log("Taking 1 from the deck:");
-    printCards(third);
-    console.log("Contents of the deck:");
-    printCards(player.deck.cards);
-
-    player.receive(second);
+    // create a new deck and deal the players cards
+    var deck = new Deck();
     
-    console.log("Receiving the second batch of cards:");
-    printCards(player.deck.cards);
+    deck.createStandard();
+    deck.shuffle();
+    var togglePlayers = true;
+    var numCards = deck.cards.length;
+    for (var i = 0; i < numCards; i++) {
+        if (togglePlayers) {
+            fp.receive(Array.from(deck.removeFromTop()));
+        } else {
+            sp.receive(Array.from(deck.removeFromTop()));
+        }
+        togglePlayers = !togglePlayers;
+    }
 
-    player.receive(first);
-    
-    console.log("Receiving the first batch of cards:");
-    printCards(player.deck.cards);
+    console.log("First player's starting deck:");
+    printCards(fp.deck.cards);
 
-    player.receive(third);
+    console.log("Second player's starting deck:");
+    printCards(sp.deck.cards);
 
-    console.log("Receiving the third batch of cards:");
-    printCards(player.deck.cards);
+    timer = (function () {
+        if (playing) {
+            game.play();
+        } else {
+            clearInterval(timer);
+        }
+    }).periodical(250);
 });
 
 function printCards(cards) {
