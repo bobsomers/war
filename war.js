@@ -237,11 +237,9 @@ var Game = new Class({
      * warchest. Otherwise, it takes one card from each to decide the outcome of the round.
      */
     play: function () {
-        // TODO: go over this function and check for DEAD players!
-
         console.log("Players deck counts:");
         for (var i = 0; i < this.players.length; i++) {
-            console.log("\t [" + i + "] " + this.players[i].deck.cards.length);
+            console.log("\t[" + i + "] " + this.players[i].deck.cards.length);
         }
               
         if (this.warMode) {
@@ -260,9 +258,8 @@ var Game = new Class({
 
             // for debugging purposes, print the contents of warchest
             // TODO remove me!
-            var copy = Array.clone(this.warChest);
             console.log("War chest contents:");
-            printCards(copy.flatten());
+            printCards(this.warChest.flatten());
         } else {
             // take one card from each player and place it on the board
             for (var i = 0; i < this.players.length; i++) {
@@ -379,44 +376,71 @@ var timer;
 
 window.addEvent('domready', function () {
     // create the players and the game
-    var fp = new Player();
-    var sp = new Player();
+    var p1 = new Player();
+    var p2 = new Player();
+    var p3 = new Player();
+    var p4 = new Player();
+    var p5 = new Player();
     game = new Game();
-    game.addPlayer(fp);
-    game.addPlayer(sp);
+    game.addPlayer(p1);
+    game.addPlayer(p2);
+    game.addPlayer(p3);
+    game.addPlayer(p4);
+    game.addPlayer(p5);
 
     // create a new deck and deal the players cards
     var deck = new Deck();
     deck.createStandard();
     deck.shuffle();
-    var togglePlayers = true;
+    var togglePlayers = 0;
     var numCards = deck.cards.length;
     for (var i = 0; i < numCards; i++) {
-        if (togglePlayers) {
-            fp.receive(Array.from(deck.removeFromTop()));
+        if (togglePlayers == 0) {
+            p1.receive(Array.from(deck.removeFromTop()));
+        } else if (togglePlayers == 1) {
+            p2.receive(Array.from(deck.removeFromTop()));
+        } else if (togglePlayers == 2) {
+            p3.receive(Array.from(deck.removeFromTop()));
+        } else if (togglePlayers == 3) {
+            p4.receive(Array.from(deck.removeFromTop()));
         } else {
-            sp.receive(Array.from(deck.removeFromTop()));
+            p5.receive(Array.from(deck.removeFromTop()));
         }
-        togglePlayers = !togglePlayers;
+        togglePlayers = (togglePlayers + 1) % 5;
     }
 
+    console.log("Starting a FIVE WAY game of War! This is pretty ridiculous...");
+
     console.log("First player's starting deck:");
-    printCards(fp.deck.cards);
+    printCards(p1.deck.cards);
 
     console.log("Second player's starting deck:");
-    printCards(sp.deck.cards);
+    printCards(p2.deck.cards);
+
+    console.log("Third player's starting deck:");
+    printCards(p3.deck.cards);
     
+    console.log("Fourth player's starting deck:");
+    printCards(p4.deck.cards);
+    
+    console.log("Fifth player's starting deck:");
+    printCards(p5.deck.cards);
+
     timer = (function () {
         if (game.playing) {
             game.play();
         } else {
             clearInterval(timer);
         }
-    }).periodical(100);
+    }).periodical(250);
 });
 
 function printCards(cards) {
     for (var i = 0; i < cards.length; i++) {
-        console.log("\t[" + i + "] " + cards[i].toString());
+        if (cards[i] == null) {
+            console.log("\t[" + i + "] null");
+        } else {
+            console.log("\t[" + i + "] " + cards[i].toString());
+        }
     }
 }
