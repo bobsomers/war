@@ -1,5 +1,5 @@
 body {
-    background: #000;
+    background: #948c75;
     margin: 0;
 }
 
@@ -8,22 +8,57 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 200px;
-    background: #f00;
+    height: 150px;
+}
+
+#hole {
+    position: relative;
+    top: 25px;
+    left: 50%;
+    /* margin-left calculated by js */
+}
+
+div.hole {
+    width: 72px;
+    height: 96px;
+    border: 2px solid #7a6a53;
+    background: #d9ceb2;
+    float: left;
+    margin-right: 20px;
+    font: bold 72px Palatino;
+    text-align: center;
+    line-height: 96px;
+    color: #444;
 }
 
 #wars {
     position: absolute;
-    top: 200px;
+    top: 150px;
     left: 0;
     width: 100%;
     height: 50px;
-    background: #0f0;
+    background: #f00;
 }
 
 #players {
     position: absolute;
-    top: 250px;
+    top: 200px;
     width: 100%;
-    background: #00f;
+}
+
+div.player {
+    float: left;
+    background: #d9ceb2;
+    border: 2px solid #7a6a53;
+    margin-left: 2%;
+}
+
+/* js calculated styles below here */
+
+#hole {
+    margin-left: -134px; /* (numPlayers * (72 + 4)) + ((numPlayers - 1) * 20) */
+}
+
+div.player {
+    width: 30%; /* (100 - ((numPlayers + 1) * 2)) / numPlayers */
 }
