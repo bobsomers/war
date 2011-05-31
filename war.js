@@ -336,6 +336,9 @@ var Game = new Class({
                 var temp = this.warChest.flatten();
                 this.players[firstPlayer].receive(temp);
                 this.warChest = [];
+
+                // fire an event that the hand was won
+                this.fireEvent('handcomplete', firstPlayer);
             }
 
             // check for win condition
@@ -368,7 +371,7 @@ var Game = new Class({
             
             // TODO: various "you won!" things...
         }
-    } 
+    }
 });
 
 /*
@@ -435,6 +438,7 @@ window.addEvent('domready', function () {
         }
     }).periodical(250);
 });
+*/
 
 function printCards(cards) {
     for (var i = 0; i < cards.length; i++) {
@@ -445,4 +449,3 @@ function printCards(cards) {
         }
     }
 }
-*/

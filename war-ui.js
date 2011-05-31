@@ -1,9 +1,98 @@
 // global variables
 var game;
+var currentPlayer = 0;
+var faceUpCards = [];
 
 // helper function for writing text to the status bar
 function writeStatus(s) {
     $$('#status h3').setProperty('html', s);
+}
+
+function handComplete(winner) {
+    writeStatus('Player ' + (winner + 1) + ' won the hand!');
+
+}
+
+function collectCards() {
+    if (currentPlayer >= game.players.length) {
+        game.play();
+    } else {
+        console.log("collecting cards from player " + currentPlayer);
+        if (game.warMode) {
+            // do a "war mode" collection from the player
+            // TODO
+        } else {
+            // do a routine collection from the player
+            writeStatus('Player ' + (currentPlayer + 1) + '\'s turn. Drag a card from your deck to your position ' + (currentPlayer + 1) + ' on the board.');
+            var img = $$('#player-' + currentPlayer + '-cards img');
+            img.addEvent('mousedown', function () {
+                if (game.players[currentPlayer].deck.size() > 1) {
+                    $('player-' + currentPlayer + '-cards').grab(new Element('img', {
+                        src: 'cards/back.png',
+                        width: 72,
+                        height: 96,
+                        alt: 'Deck'
+                    }));
+                }
+            });
+            img.addEvent('mouseup', function () {
+                if (game.players[currentPlayer].deck.size() > 1) {
+                    $('player-' + currentPlayer + '-cards').getLast('img').dispose();
+                }
+            });
+            img.makeDraggable({
+                droppables: $('hole-' + currentPlayer),
+                snap: 0,
+                onDrop: function (draggable, droppable) {
+                    if (droppable) {
+                        // eat this card image
+                        draggable.destroy();
+
+                        // add a new card to the player's deck if they have at least 2 cards left
+                        if (game.players[currentPlayer].deck.size() > 1) {
+                            $('player-' + currentPlayer + '-cards').grab(new Element('img', {
+                                src: 'cards/back.png',
+                                width: 72,
+                                height: 96,
+                                alt: 'Deck'
+                            }));
+                        }
+
+                        // replace the hole for this player with their deck's top card
+                        var hole = $('hole-' + currentPlayer);
+                        hole.setProperty('html', '');
+                        var img = new Element('img', {
+                            src: 'cards/' + game.players[currentPlayer].deck.cards[0].toString() + '.png',
+                            width: 72,
+                            height: 96,
+                            alt: game.players[currentPlayer].deck.cards[0].toString()
+                        });
+                        hole.grab(img);
+                        
+                        // add the face up card to the list of face up cards
+                        faceUpCards.push(img);
+
+                        // decrement the player's visual deck size
+                        $$('#player-' + currentPlayer + '-deck span').setProperty('html', '&times; ' + (game.players[currentPlayer].deck.size() - 1));
+
+                        // collect cards for the next player
+                        currentPlayer++;
+                        collectCards();
+                    } else {
+                        // bounce the card back to the deck
+                        var home = $('player-' + currentPlayer + '-cards').getPosition();
+                        draggable.set('morph', {
+                            transition: Fx.Transitions.Bounce.easeOut,
+                        });
+                        draggable.morph({
+                            'left': home.x + 2,
+                            'top': home.y - 158
+                        });
+                    }
+                }
+            });
+        }
+    }
 }
 
 // event handler for player select button
@@ -74,6 +163,9 @@ function startGameClicked() {
     $('hole').setStyle('margin-left', -1 * (((numPlayers * (72 + 4)) + ((numPlayers - 1) * 20)) / 2));
     $$('div.player').setStyle('width', ((100 - ((numPlayers + 1) * 2)) / numPlayers) + '%');
 
+    // hook up game event handlers
+    game.addEvent('handcomplete', handComplete);
+
     // animate out the player select panel
     $('player-select').morph({
         'opacity': [1, 0],
@@ -103,9 +195,12 @@ function startGameClicked() {
     statusBar.morph({
         'opacity': [0, 1]
     });
+
+    // kick things off by collecting cards from the first player
+    collectCards();
 }
 
-/* domready event */
 window.addEvent('domready', function () {
+    // hook up first event handler to get the ball rolling
     $('start-game').addEvent('click', startGameClicked);
 });
