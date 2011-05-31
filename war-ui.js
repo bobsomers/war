@@ -1,6 +1,7 @@
 // global variables
 var game;
 var currentPlayer = 0;
+var currentWarchest = 0;
 
 // helper function for writing text to the status bar
 function writeStatus(s) {
@@ -13,8 +14,8 @@ function warStart(warer1, warer2) {
     console.log(warer2);
     writeStatus('Player ' + (warer1 + 1) + ' and player ' + (warer2 + 1) + ' started a war!');
 
-    // move the board cards over to the left of the board
     (function () {
+        // move the board cards over to the left of the board
         var home = $('hole-0').getPosition();
         var boardCards = $$('img.boardcard');
         for (var i = 0; i < boardCards.length; i++) {
@@ -26,6 +27,47 @@ function warStart(warer1, warer2) {
                 'top': home.y + 2
             });
         }
+
+        // animate a warchest donation from each player
+        var wait = 250;
+        for (var i = 0; i < game.players.length; i++) {
+            var howMany = 3;
+            if (game.players[i].deck.size() - 3 <= 0) {
+                howMany = game.players[i].deck.size() - 1;
+            }
+
+            var home = $('hole-0').getPosition();
+            for (var j = 0; j < howMany; j++) {
+                (function (i, j, x, y) {
+                    var img = new Element('img', {
+                        src: 'cards/' + game.players[i].deck.cards[j].toString() + '.png',
+                        width: 72,
+                        height: 96,
+                        alt: game.players[i].deck.cards[j].toString(),
+                    });
+                    img.addClass('cardface');
+                    img.setStyle('position', 'absolute');
+                    var pos = $('player-' + i + '-deck').getPosition();
+                    img.setStyles({
+                        'left': pos.x + 2,
+                        'top': pos.y + 2
+                    });
+                    $$('body').grab(img);
+                    img.set('morph', {
+                        transition: Fx.Transitions.Bounce.easeOut
+                    });
+                    img.morph({
+                        'left': x,
+                        'top': y
+                    });
+
+                    // reduce the player's visual deck count by 1
+                    $$('#player-' + i + '-deck span').setProperty('html', '&times; ' + (game.players[i].deck.size() - (j + 1)));
+                }).pass([i, j, home.x - 85, home.y + 2]).delay(wait);
+                wait += 250;
+            }
+        }
+        
     }).delay(1500);
 }
 
