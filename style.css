@@ -11,10 +11,18 @@ body {
     height: 150px;
 }
 
+h1 {
+    font: bold 36px Palatino;
+    color: #000;
+    text-align: center;
+    margin: 0;
+}
+
 #hole {
     position: relative;
-    top: 25px;
+    top: 0;
     left: 50%;
+    width: 50%;
     /* margin-left calculated by js */
 }
 
@@ -31,26 +39,64 @@ div.hole {
     color: #444;
 }
 
-#wars {
-    position: absolute;
-    top: 150px;
-    left: 0;
-    width: 100%;
-    height: 50px;
-    background: #f00;
-}
-
 #players {
     position: absolute;
-    top: 200px;
+    top: 160px;
     width: 100%;
 }
 
 div.player {
     float: left;
-    background: #d9ceb2;
-    border: 2px solid #7a6a53;
     margin-left: 2%;
+}
+
+h2 {
+    font: bold 36px Palatino;
+    color: #000;
+    margin: 0;
+    padding: 0 0 1px 5px;
+    border-bottom: 2px solid #7a6a53;
+}
+
+#status {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: #d5ded9;
+    border-top: 2px solid #99b2b7;
+}
+
+h3 {
+    font: bold 24px Palatino;
+    text-align: left;
+    line-height: 40px;
+    color: #000;
+    margin: 0 0 0 20px;
+}
+
+div.deck {
+    margin: 10px 0 10px 10px;
+}
+
+div.deck span {
+    font: bold 72px Palatino;
+    line-height: 100px;
+    text-align: left;
+    padding-left: 10px;
+}
+
+div.cards {
+    width: 72px;
+    height: 96px;
+    border: 2px solid #7a6a53;
+    background: #d9ceb2;
+    float: left;
+    font: bold 72px Palatino;
+    text-align: center;
+    line-height: 96px;
+    color: #444;
 }
 
 /* js calculated styles below here */

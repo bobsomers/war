@@ -13,23 +13,38 @@
 
     <body>
         <div id="board">
+            <h1>&mdash; The Board &mdash;</h1>
             <div id="hole">
                 <div id="1-hole" class="hole">1</div>
                 <div id="2-hole" class="hole">2</div>
                 <div id="3-hole" class="hole">3</div>
             </div>
         </div>
-        <div id="wars">Wars</div>
         <div id="players">
             <div id="player-1" class="player">
-                Player 1
+                <h2>Player 1</h2>
+                <div id="player-1-deck" class="deck">
+                    <div id="player-1-cards" class="cards"></div>
+                    <span>&times; 52</span>
+                </div>
             </div>
             <div id="player-2" class="player">
-                Player 2
+                <h2>Player 2</h2>
+                <div id="player-2-deck" class="deck">
+                    <div id="player-2-cards" class="cards"></div>
+                    <span>&times; 52</span>
+                </div>
             </div>
             <div id="player-3" class="player">
-                Player 3
+                <h2>Player 3</h2>
+                <div id="player-3-deck" class="deck">
+                    <div id="player-3-cards" class="cards"></div>
+                    <span>&times; 52</span>
+                </div>
             </div>
+        </div>
+        <div id="status">
+            <h3>Player 1's turn! Drag your card to the board.</h3>
         </div>
     </body>
 </html>
