@@ -193,9 +193,7 @@ var Player = new Class({
 
     kill: function () {
         this.alive = false;
-
-        // TODO: more things when a player dies
-        playing = false;
+        this.fireEvent('died');
     }
 });
 
@@ -370,8 +368,7 @@ var Game = new Class({
         if (numLivePlayers == 1) {
             console.log("Player " + lastLivePlayer + " won!");
             this.playing = false;
-            
-            // TODO: various "you won!" things...
+            this.fireEvent('win', lastLivePlayer);
         }
     }
 });
