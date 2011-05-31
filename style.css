@@ -3,7 +3,37 @@ body {
     margin: 0;
 }
 
+#player-select {
+    position: absolute;
+    width: 500px;
+    height: 150px;
+    top: 50px;
+    left: 50%;
+    margin-left: -200px;
+    background: #d9ceb2;
+    border: 2px solid #7a6a53;
+}
+
+h4 {
+    font: bold 40px Palatino;
+    margin: 20px;
+    color: #000;
+}
+
+#player-select select {
+    font: bold 24px Palatino;
+    color: #000;
+    margin-left: 150px;
+}
+
+#player-select input {
+    font: bold 24px Palatino;
+    color: #000;
+}
+
+
 #board {
+    display: none;
     position: absolute;
     top: 0;
     left: 0;
@@ -36,16 +66,18 @@ div.hole {
     font: bold 72px Palatino;
     text-align: center;
     line-height: 96px;
-    color: #444;
+    color: #7a6a53;
 }
 
 #players {
+    display: none;
     position: absolute;
     top: 160px;
     width: 100%;
 }
 
 div.player {
+    /* width calculated by js */
     float: left;
     margin-left: 2%;
 }
@@ -59,6 +91,7 @@ h2 {
 }
 
 #status {
+    display: none;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -113,25 +146,15 @@ div.warchest-card {
     margin-right: 10px;
 }
 
-div#autoplay-box {
+#autoplay-box {
     position: absolute;
     top: 0;
     right: 0; 
     margin-right: 20px;
 }
 
-div#autoplay-box label {
+#autoplay-box label {
     font: bold 18px Palatino;
     color: #000;
     line-height: 40px;
-}
-
-/* js calculated styles below here */
-
-#hole {
-    margin-left: -134px; /* (numPlayers * (72 + 4)) + ((numPlayers - 1) * 20) */
-}
-
-div.player {
-    width: 30%; /* (100 - ((numPlayers + 1) * 2)) / numPlayers */
 }

@@ -371,6 +371,7 @@ var Game = new Class({
     } 
 });
 
+/*
 var game;
 var timer;
 
@@ -444,3 +445,4 @@ function printCards(cards) {
         }
     }
 }
+*/
