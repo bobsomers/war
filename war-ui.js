@@ -10,7 +10,19 @@ function writeStatus(s) {
 
 function handComplete(winner) {
     writeStatus('Player ' + (winner + 1) + ' won the hand!');
-
+    
+    // bounce all the face up cards to the winner's deck
+    var home = $('player-' + winner + '-cards').getPosition();
+    for (var i = 0; i < faceUpCards.length; i++) {
+        faceUpCards[i].setStyle('position', 'absolute');
+        faceUpCards[i].set('morph', {
+            transition: Fx.Transitions.Bounce.easeOut,
+        });
+        faceUpCards[i].morph({
+            'left': home.x,
+            'top': home.y
+        });
+    }
 }
 
 function collectCards() {
@@ -61,16 +73,16 @@ function collectCards() {
                         // replace the hole for this player with their deck's top card
                         var hole = $('hole-' + currentPlayer);
                         hole.setProperty('html', '');
-                        var img = new Element('img', {
+                        var faceUp = new Element('img', {
                             src: 'cards/' + game.players[currentPlayer].deck.cards[0].toString() + '.png',
                             width: 72,
                             height: 96,
                             alt: game.players[currentPlayer].deck.cards[0].toString()
                         });
-                        hole.grab(img);
-                        
+                        hole.grab(faceUp);
+
                         // add the face up card to the list of face up cards
-                        faceUpCards.push(img);
+                        faceUpCards.push(faceUp);
 
                         // decrement the player's visual deck size
                         $$('#player-' + currentPlayer + '-deck span').setProperty('html', '&times; ' + (game.players[currentPlayer].deck.size() - 1));
