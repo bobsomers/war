@@ -11,7 +11,7 @@ function writeStatus(s) {
 
 // game win handler
 function gameWin(player) {
-    writeStatus('Player ' + player + ' won the game!');
+    writeStatus('Player ' + (player + 1) + ' won the game!');
 
     // make sure they have 52 cards... this is an edge case where you can have some cards sitting
     // in the warchest because the opposing player died during a war
