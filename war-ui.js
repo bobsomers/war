@@ -1,30 +1,43 @@
 // global variables
 var game;
 var currentPlayer = 0;
-var faceUpCards = [];
 
 // helper function for writing text to the status bar
 function writeStatus(s) {
     $$('#status h3').setProperty('html', s);
 }
 
+// event handler for completion of a hand
 function handComplete(winner) {
     writeStatus('Player ' + (winner + 1) + ' won the hand!');
-    
-    // bounce all the face up cards to the winner's deck
-    var home = $('player-' + winner + '-cards').getPosition();
-    for (var i = 0; i < faceUpCards.length; i++) {
-        faceUpCards[i].setStyle('position', 'absolute');
-        faceUpCards[i].set('morph', {
-            transition: Fx.Transitions.Bounce.easeOut,
-        });
-        faceUpCards[i].morph({
-            'left': home.x,
-            'top': home.y
-        });
-    }
+    (function () {
+        // bounce all the face up cards to the winner's deck
+        var home = $('player-' + winner + '-cards').getPosition();
+        var faceUpCards = $$('img.cardface');
+        for (var i = 0; i < faceUpCards.length; i++) {
+            faceUpCards[i].set('morph', {
+                transition: Fx.Transitions.Bounce.easeOut,
+                onComplete: (function () {
+                    this.destroy();
+
+            }).bind(faceUpCards[i])
+            });
+            faceUpCards[i].morph({
+                'left': home.x + 2,
+                'top': home.y + 2
+            });
+        }
+        
+        // update the winner's visual deck count
+        $$('#player-' + winner + '-deck span').setProperty('html', '&times; ' + game.players[winner].deck.size());
+
+        // start collecting cards again for the first player
+        currentPlayer = 0;
+        collectCards();
+    }).delay(1500);
 }
 
+// collects cards from the current player via drag and drop
 function collectCards() {
     if (currentPlayer >= game.players.length) {
         game.play();
@@ -43,7 +56,8 @@ function collectCards() {
                         src: 'cards/back.png',
                         width: 72,
                         height: 96,
-                        alt: 'Deck'
+                        alt: 'Deck',
+                        'class': 'cardback'
                     }));
                 }
             });
@@ -66,23 +80,26 @@ function collectCards() {
                                 src: 'cards/back.png',
                                 width: 72,
                                 height: 96,
-                                alt: 'Deck'
+                                alt: 'Deck',
+                                'class': 'cardback'
                             }));
                         }
 
                         // replace the hole for this player with their deck's top card
-                        var hole = $('hole-' + currentPlayer);
-                        hole.setProperty('html', '');
                         var faceUp = new Element('img', {
                             src: 'cards/' + game.players[currentPlayer].deck.cards[0].toString() + '.png',
                             width: 72,
                             height: 96,
-                            alt: game.players[currentPlayer].deck.cards[0].toString()
+                            alt: game.players[currentPlayer].deck.cards[0].toString(),
+                            'class': 'cardface'
                         });
-                        hole.grab(faceUp);
-
-                        // add the face up card to the list of face up cards
-                        faceUpCards.push(faceUp);
+                        faceUp.setStyle('position', 'absolute');
+                        var pos = $('hole-' + currentPlayer).getPosition();
+                        faceUp.setStyles({
+                            'left': pos.x + 2,
+                            'top': pos.y + 2
+                        });
+                        $$('body').grab(faceUp);
 
                         // decrement the player's visual deck size
                         $$('#player-' + currentPlayer + '-deck span').setProperty('html', '&times; ' + (game.players[currentPlayer].deck.size() - 1));
@@ -98,7 +115,7 @@ function collectCards() {
                         });
                         draggable.morph({
                             'left': home.x + 2,
-                            'top': home.y - 158
+                            'top': home.y - 208
                         });
                     }
                 }
@@ -142,7 +159,8 @@ function startGameClicked() {
             src: 'cards/back.png',
             width: 72,
             height: 96,
-            alt: "Deck"
+            alt: "Deck",
+            'class': 'cardback'
         });
         var cards = new Element('div', {
             id: 'player-' + i + '-cards',
