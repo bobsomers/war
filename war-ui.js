@@ -7,6 +7,28 @@ function writeStatus(s) {
     $$('#status h3').setProperty('html', s);
 }
 
+// event handler for starting a war
+function warStart(warer1, warer2) {
+    console.log(warer1);
+    console.log(warer2);
+    writeStatus('Player ' + (warer1 + 1) + ' and player ' + (warer2 + 1) + ' started a war!');
+
+    // move the board cards over to the left of the board
+    (function () {
+        var home = $('hole-0').getPosition();
+        var boardCards = $$('img.boardcard');
+        for (var i = 0; i < boardCards.length; i++) {
+            boardCards[i].set('morph', {
+                transition: Fx.Transitions.Bounce.easeOut
+            });
+            boardCards[i].morph({
+                'left': home.x - 85,
+                'top': home.y + 2
+            });
+        }
+    }).delay(1500);
+}
+
 // event handler for completion of a hand
 function handComplete(winner) {
     writeStatus('Player ' + (winner + 1) + ' won the hand!');
@@ -18,9 +40,8 @@ function handComplete(winner) {
             faceUpCards[i].set('morph', {
                 transition: Fx.Transitions.Bounce.easeOut,
                 onComplete: (function () {
-                    this.destroy();
-
-            }).bind(faceUpCards[i])
+                        this.destroy();
+                }).bind(faceUpCards[i])
             });
             faceUpCards[i].morph({
                 'left': home.x + 2,
@@ -56,8 +77,7 @@ function collectCards() {
                         src: 'cards/back.png',
                         width: 72,
                         height: 96,
-                        alt: 'Deck',
-                        'class': 'cardback'
+                        alt: 'Deck'
                     }));
                 }
             });
@@ -80,8 +100,7 @@ function collectCards() {
                                 src: 'cards/back.png',
                                 width: 72,
                                 height: 96,
-                                alt: 'Deck',
-                                'class': 'cardback'
+                                alt: 'Deck'
                             }));
                         }
 
@@ -91,8 +110,9 @@ function collectCards() {
                             width: 72,
                             height: 96,
                             alt: game.players[currentPlayer].deck.cards[0].toString(),
-                            'class': 'cardface'
                         });
+                        faceUp.addClass('cardface');
+                        faceUp.addClass('boardcard');
                         faceUp.setStyle('position', 'absolute');
                         var pos = $('hole-' + currentPlayer).getPosition();
                         faceUp.setStyles({
@@ -195,6 +215,7 @@ function startGameClicked() {
 
     // hook up game event handlers
     game.addEvent('handcomplete', handComplete);
+    game.addEvent('warstart', warStart);
 
     // animate out the player select panel
     $('player-select').morph({

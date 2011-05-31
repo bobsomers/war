@@ -325,6 +325,8 @@ var Game = new Class({
                 // add the contents of the board to the warchest
                 this.warChest.append(this.board);
                 this.board = [];
+
+                this.fireEvent('warstart', [firstPlayer, secondPlayer]);
             } else {
                 console.log("Player " + firstPlayer + " wins the hand with " + firstCard.toString());
                 

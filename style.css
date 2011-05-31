@@ -31,7 +31,6 @@ h4 {
     color: #000;
 }
 
-
 #board {
     display: none;
     position: absolute;
@@ -130,14 +129,6 @@ div.cards {
     text-align: center;
     line-height: 96px;
     color: #444;
-}
-
-img.cardback {
-    z-index: 10;
-}
-
-img.cardface {
-    z-index: 5;
 }
 
 div.warchest {
